@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Stream</title>
+    <style>
+        :root {
+            --bg-main: #0f0f0f;
+            --bg-surface: #212121;
+            --bg-hover: #3f3f3f;
+            --text-main: #f1f1f1;
+            --text-secondary: #aaa;
+            --accent: #ff0000;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Roboto, Arial, sans-serif;
+            margin: 0;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+        }
+
+        /* --- Barra Superior (Header estilo YouTube) --- */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 56px;
+            padding: 0 16px;
+            background-color: var(--bg-main);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid #303030;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .logo-icon {
+            background-color: var(--accent);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .search-bar {
+            display: none;
+            width: 40%;
+            max-width: 600px;
+            background: #121212;
+            border: 1px solid #303030;
+            border-radius: 20px 0 0 20px;
+            padding: 8px 16px;
+            color: white;
+            font-size: 1rem;
+        }
+
+        @media (min-width: 768px) {
+            .search-bar {
+                display: block;
+            }
+        }
+
+        /* --- Contenedor Principal (Flexbox para Sidebar + Contenido) --- */
+        .main-layout {
+            display: flex;
+            min-height: calc(100vh - 56px);
+        }
+
+        /* Sidebar lateral (oculto en móviles pequeños) */
+        aside {
+            width: 72px;
+            background-color: var(--bg-main);
+            padding: 12px 4px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+            border-right: 1px solid #303030;
+        }
+
+        @media (min-width: 1024px) {
+            aside {
+                width: 240px;
+                align-items: flex-start;
+                padding: 12px;
+            }
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.75rem;
+            color: var(--text-main);
+            text-decoration: none;
+            width: 100%;
+            padding: 10px 0;
+            border-radius: 8px;
+        }
+
+        @media (min-width: 1024px) {
+            .nav-item {
+                flex-direction: row;
+                gap: 20px;
+                padding: 10px 16px;
+                font-size: 0.9rem;
+            }
+        }
+
+        .nav-item:hover {
+            background-color: var(--bg-hover);
+        }
+
+        /* --- Cuadrícula de Videos (CSS Grid estilo YouTube) --- */
+        main {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+        }
+
+        .video-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        @media (min-width: 640px) {
+            .video-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .video-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (min-width: 1440px) {
+            .video-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        /* Tarjeta de Video individual */
+        .video-card {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .video-player-wrapper {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background-color: #000;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .video-info {
+            display: flex;
+            gap: 12px;
+        }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            background-color: #555;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .video-details h3 {
+            font-size: 0.95rem;
+            font-weight: 500;
+            margin: 0 0 4px 0;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .video-details p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Cabecera estilo YouTube -->
+    <header>
+        <div class="logo-area">
+            <span class="logo-icon">YouTube</span>
+        </div>
+        <input type="text" class="search-bar" placeholder="Buscar videos...">
+        <div>Account</div>
+    </header>
+
+    <div class="main-layout">
+        <!-- Barra lateral -->
+        <aside>
+            <a href="#" class="nav-item">🏠 <span>Inicio</span></a>
+            <a href="#" class="nav-item">📹 <span>videos</span></a>
+            <a href="#" class="nav-item">📚 <span>Suscripciones</span></a>
+            <a href="#" class="nav-item">📁 <span>Biblioteca</span></a>
+        </aside>
+
+        <!-- Contenido Principal con Grid -->
+        <main>
+            <section class="video-grid" id="video-container">
+                <!-- Los videos se cargan dinámicamente aquí -->
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // Petición al backend FastAPI respetando la regla estricta de CERO innerHTML
+        fetch("http://localhost:8000/videos/")
+            .then(res => res.json())
+            .then(videos => {
+                const container = document.getElementById("video-container");
+
+                videos.forEach(video => {
+                    // Contenedor principal de la tarjeta
+                    const card = document.createElement("div");
+                    card.classList.add("video-card");
+
+                    // Contenedor del reproductor de video
+                    const playerWrapper = document.createElement("div");
+                    playerWrapper.classList.add("video-player-wrapper");
+
+                    const videoElement = document.createElement("video");
+                    videoElement.src = video.source; // URL dinámica provista por AWS S3 y SQLite
+                    videoElement.controls = true;
+                    videoElement.preload = "metadata";
+
+                    playerWrapper.appendChild(videoElement);
+
+                    // Sección de metadatos (avatar + textos)
+                    const infoDiv = document.createElement("div");
+                    infoDiv.classList.add("video-info");
+
+                    const avatar = document.createElement("div");
+                    avatar.classList.add("avatar");
+
+                    const detailsDiv = document.createElement("div");
+                    detailsDiv.classList.add("video-details");
+
+                    const title = document.createElement("h3");
+                    title.textContent = video.titulo; // Seguro contra ataques XSS, sin innerHTML
+
+                    const channelName = document.createElement("p");
+                    channelName.textContent = video.category || "Canal de Streaming";
+
+                    const description = document.createElement("p");
+                    description.textContent = video.descripcion;
+
+                    // Ensamblar la estructura de la tarjeta
+                    detailsDiv.appendChild(title);
+                    detailsDiv.appendChild(channelName);
+                    detailsDiv.appendChild(description);
+
+                    infoDiv.appendChild(avatar);
+                    infoDiv.appendChild(detailsDiv);
+
+                    card.appendChild(playerWrapper);
+                    card.appendChild(infoDiv);
+
+                    // Agregar al contenedor en la interfaz
+                    container.appendChild(card);
+                });
+            })
+            .catch(error => {
+                console.error("Error al conectar con la API:", error);
+            });
+    </script>
+</body>
+</html>
