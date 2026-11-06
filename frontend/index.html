@@ -367,7 +367,6 @@
         let allVideos = [];
 
 
-        // Crea un elemento con clase y texto (textContent: seguro contra XSS, sin innerHTML)
         function createElement(tag, className, text) {
             const element = document.createElement(tag);
             if (className) element.classList.add(className);
@@ -376,7 +375,6 @@
         }
 
         function goToVideo(id) {
-            // Redirige a watch.html enviando el ID del video como parámetro GET
             window.location.href = `watch.html?id=${encodeURIComponent(id)}`;
         }
 
@@ -417,7 +415,7 @@
         }
 
         function renderVideos(videos) {
-            container.replaceChildren(); // Vacía el contenedor sin innerHTML
+            container.replaceChildren(); 
 
             if (videos.length === 0) {
                 statusMessage.textContent = "No se encontraron videos.";
