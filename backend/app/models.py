@@ -6,8 +6,8 @@ class Videos(SQLModel, table=True):
     titulo: str
     descripcion: str
     category: str = Field(index=True)
-    source: str          # URL de S3 o recurso multimedia
-    thumbnail_url: str   # Miniatura
+    source: str
+    thumbnail_url: str
     es_publico: bool = True
     
     comments: List["Comments"] = Relationship(

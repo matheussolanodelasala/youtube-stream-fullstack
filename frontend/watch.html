@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reproductor - YouTube Stream</title>
+    <style>
+        :root {
+            --bg-main: #0f0f0f;
+            --bg-surface: #212121;
+            --bg-hover: #3f3f3f;
+            --border: #303030;
+            --text-main: #f1f1f1;
+            --text-secondary: #aaa;
+            --accent: #ff0000;
+            --header-h: 56px;
+            --transition: 0.25s ease;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Roboto, Arial, sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+        }
+
+        .site-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: var(--header-h);
+            padding: 0 16px;
+            background-color: var(--bg-main);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            background-color: var(--accent);
+            color: #fff;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: transform var(--transition);
+        }
+
+        .logo-area:hover .logo-icon {
+            transform: scale(1.08);
+        }
+
+        .watch-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 16px;
+        }
+
+        .primary-column {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            min-width: 0;
+        }
+
+        .player-wrapper {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background-color: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            animation: fadeIn 0.6s ease both;
+        }
+
+        .player-wrapper video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .video-title {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .video-description-box {
+            background-color: var(--bg-surface);
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            transition: background-color var(--transition);
+        }
+
+        .video-description-box:hover {
+            background-color: var(--bg-hover);
+        }
+
+        .comments-section {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .comments-title {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .comment-form {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .comment-input {
+            flex: 1;
+            min-width: 0;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid var(--border);
+            color: #fff;
+            padding: 8px 0;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color var(--transition);
+        }
+
+        .comment-input:focus {
+            border-bottom-color: var(--text-main);
+        }
+
+        .comment-btn {
+            background-color: var(--text-main);
+            color: var(--bg-main);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 18px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color var(--transition), transform var(--transition);
+        }
+
+        .comment-btn:hover:not(:disabled) {
+            background-color: #d1d1d1;
+            transform: scale(1.05);
+        }
+
+        .comment-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .comments-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .comment-item {
+            display: flex;
+            gap: 12px;
+            animation: fadeInUp 0.4s ease both;
+        }
+
+        .avatar {
+            flex-shrink: 0;
+            width: 36px;
+            height: 36px;
+            background-color: #555;
+            border-radius: 50%;
+        }
+
+        .comment-content p {
+            margin: 0 0 4px;
+            font-size: 0.9rem;
+        }
+
+        .comment-user {
+            font-weight: 500;
+            font-size: 0.85rem;
+        }
+
+        .comment-text {
+            color: var(--text-secondary);
+            overflow-wrap: anywhere;
+        }
+
+        .status-message {
+            margin: 0;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .secondary-column {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .secondary-title {
+            margin: 0 0 8px;
+            font-size: 1rem;
+        }
+
+        .recommendation-card {
+            display: flex;
+            gap: 10px;
+            color: inherit;
+            text-decoration: none;
+            animation: fadeInUp 0.5s ease both;
+            transition: transform var(--transition);
+        }
+
+        .recommendation-card:hover,
+        .recommendation-card:focus-visible {
+            transform: translateX(4px);
+            outline: none;
+        }
+
+        .rec-thumbnail {
+            flex-shrink: 0;
+            width: 160px;
+            aspect-ratio: 16 / 9;
+            background-color: #222;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: box-shadow var(--transition);
+        }
+
+        .recommendation-card:hover .rec-thumbnail {
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.6);
+        }
+
+        .rec-thumbnail video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+
+        .recommendation-card:hover .rec-thumbnail video {
+            transform: scale(1.06);
+        }
+
+        .rec-info {
+            min-width: 0;
+        }
+
+        .rec-info h4 {
+            margin: 0 0 4px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            line-clamp: 2;
+            -webkit-line-clamp: 2;
+        }
+
+        .rec-info p {
+            margin: 0;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation: none !important;
+                transition: none !important;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .watch-container {
+                padding: 24px;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .watch-container {
+                grid-template-columns: 1fr 400px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="site-header">
+        <a href="index.html" class="logo-area" aria-label="Volver al inicio">
+            <span class="logo-icon">YouTube</span>
+            <span>Stream</span>
+        </a>
+        <div>Account</div>
+    </header>
+
+    <div class="watch-container">
+
+        <main class="primary-column">
+            <div class="player-wrapper">
+                <video id="main-video" controls autoplay></video>
+            </div>
+            <h1 class="video-title" id="video-title">Cargando título...</h1>
+            <div class="video-description-box" id="video-description">
+                Cargando descripción y detalles del video desde la nube...
+            </div>
+
+            <section class="comments-section" aria-labelledby="comments-count">
+                <h2 class="comments-title" id="comments-count">Comentarios</h2>
+
+                <form class="comment-form" id="comment-form">
+                    <div class="avatar"></div>
+                    <input type="text" id="comment-input" class="comment-input" placeholder="Agrega un comentario..." aria-label="Escribe un comentario" autocomplete="off">
+                    <button type="submit" id="comment-submit" class="comment-btn">Comentar</button>
+                </form>
+
+                <p class="status-message" id="comments-status" role="status" hidden></p>
+
+                <div class="comments-list" id="comments-container">
+                </div>
+            </section>
+        </main>
+
+        <aside class="secondary-column" id="recommendations-container" aria-label="Videos recomendados">
+            <h2 class="secondary-title">Videos recomendados</h2>
+        </aside>
+
+    </div>
+
+    <script>
+        "use strict";
+
+        const API_URL = "http://localhost:8000";
+        const MAX_RECOMMENDATIONS = 10;
+
+        const mainVideo = document.getElementById("main-video");
+        const titleEl = document.getElementById("video-title");
+        const descriptionEl = document.getElementById("video-description");
+        const commentsContainer = document.getElementById("comments-container");
+        const commentsCount = document.getElementById("comments-count");
+        const commentsStatus = document.getElementById("comments-status");
+        const commentForm = document.getElementById("comment-form");
+        const commentInput = document.getElementById("comment-input");
+        const commentSubmit = document.getElementById("comment-submit");
+        const recContainer = document.getElementById("recommendations-container");
+
+        function createElement(tag, className, text) {
+            const element = document.createElement(tag);
+            if (className) element.classList.add(className);
+            if (text) element.textContent = text;
+            return element;
+        }
+
+        function shuffle(list) {
+            const copy = [...list];
+            for (let i = copy.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [copy[i], copy[j]] = [copy[j], copy[i]];
+            }
+            return copy;
+        }
+
+        async function fetchJSON(url, options) {
+            const response = await fetch(url, options);
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            return response.json();
+        }
+
+        const videoId = new URLSearchParams(window.location.search).get("id");
+
+        if (!videoId) {
+            alert("No se ha especificado ningún video.");
+            window.location.href = "index.html";
+        }
+
+        async function loadVideo() {
+            try {
+                const video = await fetchJSON(`${API_URL}/videos/${videoId}`);
+
+                titleEl.textContent = video.titulo;
+                descriptionEl.textContent = video.descripcion || "Sin descripción disponible.";
+                document.title = `${video.titulo} - YouTube Stream`;
+                mainVideo.src = video.source;
+                if (video.thumbnail) mainVideo.poster = video.thumbnail;
+
+                loadRecommendations(video.category);
+            } catch (error) {
+                console.error("Error al cargar el video:", error);
+                titleEl.textContent = "No se pudo cargar el video.";
+                descriptionEl.textContent = "Verifica que la API esté en ejecución.";
+            }
+        }
+
+        function createCommentItem(comment) {
+            const item = createElement("article", "comment-item");
+
+            const avatar = createElement("div", "avatar");
+
+            const content = createElement("div", "comment-content");
+            content.appendChild(createElement("p", "comment-user", comment.user || "Usuario Invitado"));
+            content.appendChild(createElement("p", "comment-text", comment.texto));
+
+            item.appendChild(avatar);
+            item.appendChild(content);
+            return item;
+        }
+
+        async function loadComments() {
+            try {
+                const comments = await fetchJSON(`${API_URL}/videos/${videoId}/comments`);
+
+                commentsContainer.replaceChildren();
+                commentsCount.textContent = `${comments.length} Comentarios`;
+                commentsStatus.hidden = comments.length > 0;
+                commentsStatus.textContent = "Sé el primero en comentar.";
+
+                const fragment = document.createDocumentFragment();
+                comments.forEach((comment) => fragment.appendChild(createCommentItem(comment)));
+                commentsContainer.appendChild(fragment);
+            } catch (error) {
+                console.error("Error al cargar comentarios:", error);
+                commentsStatus.textContent = "No se pudieron cargar los comentarios.";
+                commentsStatus.hidden = false;
+            }
+        }
+
+        commentForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+
+            const texto = commentInput.value.trim();
+            if (!texto) return;
+
+            commentSubmit.disabled = true;
+
+            try {
+                await fetchJSON(`${API_URL}/videos/${videoId}/comments`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        texto: texto,
+                        user: "Matheus (Estudiante)"
+                    })
+                });
+
+                commentInput.value = "";
+                await loadComments();
+            } catch (error) {
+                console.error("Error al enviar comentario:", error);
+                commentsStatus.textContent = "No se pudo enviar el comentario.";
+                commentsStatus.hidden = false;
+            } finally {
+                commentSubmit.disabled = false;
+            }
+        });
+
+        function createRecommendationCard(video, index) {
+            const card = createElement("a", "recommendation-card");
+            card.href = `watch.html?id=${encodeURIComponent(video.id)}`;
+            card.style.animationDelay = `${index * 0.05}s`;
+
+            const thumbWrapper = createElement("div", "rec-thumbnail");
+            const thumbVideo = document.createElement("video");
+            thumbVideo.src = video.source;
+            if (video.thumbnail) thumbVideo.poster = video.thumbnail;
+            thumbVideo.muted = true;
+            thumbVideo.preload = "metadata";
+            thumbWrapper.appendChild(thumbVideo);
+
+            const info = createElement("div", "rec-info");
+            info.appendChild(createElement("h4", null, video.titulo));
+            info.appendChild(createElement("p", null, video.category || "Streaming"));
+
+            card.appendChild(thumbWrapper);
+            card.appendChild(info);
+            return card;
+        }
+
+        async function loadRecommendations(currentCategory) {
+            try {
+                const videos = await fetchJSON(`${API_URL}/videos/`);
+
+                const recommended = shuffle(
+                    videos.filter((video) =>
+                        String(video.id) !== String(videoId) &&
+                        video.category === currentCategory
+                    )
+                ).slice(0, MAX_RECOMMENDATIONS);
+
+                const fragment = document.createDocumentFragment();
+                recommended.forEach((video, index) => fragment.appendChild(createRecommendationCard(video, index)));
+                recContainer.appendChild(fragment);
+            } catch (error) {
+                console.error("Error cargando recomendaciones:", error);
+            }
+        }
+
+        if (videoId) {
+            loadVideo();
+            loadComments();
+        }
+    </script>
+</body>
+</html>
